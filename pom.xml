@@ -4,17 +4,16 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.camunda.community.extension.name</groupId>
-  <artifactId>give-me-a-name</artifactId>
+  <artifactId>zeebe-identity-interceptor</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>give-me-a-name</name>
+  <name>Zeebe Identity Interceptor</name>
 
   <scm>
-    <url>https://github.com/camunda-community-hub/maven-template</url>
-    <connection>scm:git:git@github.com:camunda-community-hub/maven-template.git</connection>
-    <developerConnection>scm:git:git@github.com:camunda-community-hub/maven-template.git
+    <url>https://github.com/camunda-community-hub/zeebe-identity-interceptor</url>
+    <connection>scm:git:git@github.com:camunda-community-hub/zeebe-identity-interceptor.git</connection>
+    <developerConnection>scm:git:git@github.com:camunda-community-hub/zeebe-identity-interceptor.git
     </developerConnection>
     <tag>HEAD</tag>
   </scm>
@@ -28,8 +27,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <version.java>11</version.java>
-    <maven.version>3.0</maven.version>
+    <version.java>17</version.java>
+    <maven.version>3.8</maven.version>
   </properties>
 
   <dependencyManagement>
@@ -41,19 +40,116 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+
+      <dependency>
+        <groupId>io.grpc</groupId>
+        <artifactId>grpc-bom</artifactId>
+        <version>1.51.1</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-framework-bom</artifactId>
+        <version>5.3.23</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers-bom</artifactId>
+        <version>1.17.6</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
   <dependencies>
+    <!-- Identity SDK -->
+    <dependency>
+      <groupId>io.camunda</groupId>
+      <artifactId>identity-sdk</artifactId>
+      <version>8.1.5</version>
+    </dependency>
+
+    <!-- Zeebe dependency -->
+    <dependency>
+      <groupId>io.camunda</groupId>
+      <artifactId>zeebe-util</artifactId>
+      <version>8.1.5</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- gRPC dependency -->
+    <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Logging -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>2.0.3</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>2.0.3</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Configuration -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot</artifactId>
+      <version>2.7.5</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Test dependencies -->
+
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
       <version>3.23.1</version>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.dasniko</groupId>
+      <artifactId>testcontainers-keycloak</artifactId>
+      <version>1.10.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -78,6 +174,7 @@
           </execution>
         </executions>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -98,48 +195,11 @@
         </executions>
       </plugin>
 
-      <!-- JaCoCo Plugin -->
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.8</version>
-        <executions>
-          <execution>
-            <id>coverage-initialize</id>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>coverage-report</id>
-            <phase>post-integration-test</phase>
-            <goals>
-              <goal>report</goal>
-            </goals>
-          </execution>
-          <!-- Threshold -->
-        </executions>
-      </plugin>
       <!-- Surefire plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.0.0-M7</version>
-      </plugin>
-
-      <!-- flaky test extractor plugin -->
-      <plugin>
-        <groupId>io.zeebe</groupId>
-        <artifactId>flaky-test-extractor-maven-plugin</artifactId>
-        <version>2.1.1</version>
-        <executions>
-          <execution>
-            <phase>post-integration-test</phase>
-            <goals>
-              <goal>extract-flaky-tests</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

@@ -1,0 +1,5 @@
+zeebe:
+  gateway:
+    interceptors:
+      identity:
+        endpoint: "https://mySuperIdentityEndpoint"
